@@ -9,7 +9,6 @@ use std::{
     time::{Duration, Instant, SystemTime},
 };
 
-
 use anyhow::Result;
 use bytes::Bytes;
 use rand::Rng;
@@ -106,7 +105,7 @@ const CHARS: &[char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["qq.iw2u.cn"];
-pub const RS_PUB_KEY: &str = "RustDesk";
+pub const RS_PUB_KEY: &str = "vLS6F7hufPabK4mbDPyGMBbn+Y3vexV66BEO+0kuRYU=";
 pub const API_SERVER: &str = "http://qq.iw2u.cn:21114";
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
