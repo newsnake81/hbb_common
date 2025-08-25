@@ -75,6 +75,7 @@ lazy_static::lazy_static! {
     	};
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
 }
+// Password
 
 lazy_static::lazy_static! {
     pub static ref APP_DIR: RwLock<String> = Default::default();
@@ -104,6 +105,7 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
+// Servers&Key
 pub const RENDEZVOUS_SERVERS: &[&str] = &["qq.iw2u.cn"];
 pub const RS_PUB_KEY: &str = "vLS6F7hufPabK4mbDPyGMBbn+Y3vexV66BEO+0kuRYU=;
 
