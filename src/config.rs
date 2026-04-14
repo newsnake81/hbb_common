@@ -2078,6 +2078,9 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+
         // 默认开启 IPv6 P2P 连接
         if !config.options.contains_key("enable-ipv6-punch") {
             config.options.insert("enable-ipv6-punch".to_string(), "Y".to_string());
