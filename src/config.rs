@@ -528,19 +528,7 @@ impl Config2 {
             store = true;
         }
         
-        // 默认开启 IPv6 P2P 连接
-        if !config.options.contains_key("enable-ipv6-punch") {
-            config.options.insert("enable-ipv6-punch".to_string(), "Y".to_string());
-            store = true;
-        }
-        
-        // 默认开启真彩 4:4:4
-        if !config.options.contains_key("i444") {
-            config.options.insert("i444".to_string(), "Y".to_string());
-            store = true;
-        }
-        
-        // 默认启用PIN码解锁设置
+         // 默认启用PIN码解锁设置
         if config.unlock_pin.is_empty() {
             config.unlock_pin = "00yGxF4dWiDC4tSxYsBkxeTBlep9t8og==".to_string();
             store = true;
@@ -2090,7 +2078,23 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        // 默认开启 IPv6 P2P 连接
+        if !config.options.contains_key("enable-ipv6-punch") {
+            config.options.insert("enable-ipv6-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认开启 UDP P2P 连接
+        //if !config.options.contains_key("enable-udp-punch") {
+        //    config.options.insert("enable-udp-punch".to_string(), "Y".to_string());
+        //    store = true;
+        //}
+        
+        if store {
+            config.store();
+        }
+        config
+    }
     }
 
     fn store(&self) {
@@ -2309,6 +2313,14 @@ impl UserDefaultConfig {
 
     pub fn get(&self, key: &str) -> String {
         match key {
+        // 真彩 4:4:4 默认开启，用户可修改
+        keys::OPTION_I444 => {
+            let v = self.get_after(key).map(|v| v.to_string()).unwrap_or_default();
+            if v.is_empty() {
+                return "Y".to_string();
+            }
+            return v;
+        }
             #[cfg(any(target_os = "android", target_os = "ios"))]
             keys::OPTION_VIEW_STYLE => self.get_string(key, "adaptive", vec!["original"]),
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
