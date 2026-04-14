@@ -2095,7 +2095,6 @@ impl LocalConfig {
         }
         config
     }
-    }
 
     fn store(&self) {
         Config::store_(self, "_local");
