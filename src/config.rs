@@ -120,7 +120,7 @@ const CHARS: &[char] = &[
 ];
 
 // 修改为
-pub const RENDEZVOUS_SERVERS: &[&str] = &["qq.iw2u.cn"];
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.iw2u.cn"];
 pub const RS_PUB_KEY: &str = "vLS6F7hufPabK4mbDPyGMBbn+Y3vexV66BEO+0kuRYU=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
