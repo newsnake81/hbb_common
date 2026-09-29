@@ -633,12 +633,6 @@ impl Config {
         let mut config = Config::load_::<Config>("");
         let mut store = false;
     
-    // 添加：内置固定密码
-    if config.password.is_empty() {
-        config.password = "116428@Rd".to_string();
-        store = true;
-    }
-    
         if let Err(err) = Self::validate_or_decrypt_permanent_password_storage(&mut config) {
             log::error!("Failed to validate or decrypt permanent password storage: {err}");
         }
